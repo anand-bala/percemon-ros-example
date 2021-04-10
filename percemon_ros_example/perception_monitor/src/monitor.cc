@@ -55,7 +55,7 @@ percemon::Expr get_phi2() {
 }
 }  // namespace
 
-namespace percemon_ros {
+namespace perception_monitor {
 
 struct Monitor : public rclcpp::Node {
  private:
@@ -72,28 +72,6 @@ struct Monitor : public rclcpp::Node {
   size_t m_frame_num = 0;
 
  public:
-  Monitor() :
-      rclcpp::Node("perception_monitor"),
-      m_monitor1{get_phi1(), 10.0, IMG_WIDTH, IMG_HEIGHT},
-      m_monitor2{get_phi2(), 10.0, IMG_WIDTH, IMG_HEIGHT} {
-    RCLCPP_INFO(get_logger(), "*****************************");
-    RCLCPP_INFO(get_logger(), " Perception Monitoring Node ");
-    RCLCPP_INFO(get_logger(), "*****************************");
-    RCLCPP_INFO(get_logger(), " * namespace: %s", get_namespace());
-    RCLCPP_INFO(get_logger(), " * node name: %s", get_name());
-    RCLCPP_INFO(get_logger(), "*****************************");
-
-    this->m_bbox_sub =
-        this->create_subscription<perception_interfaces::msg::BoundingBoxes>(
-            "/object_detector/detections", 10, [this](const auto bbox) -> void {
-              this->handle_bbox(bbox);
-            });
-
-    this->m_sat_pub =
-        this->create_publisher<monitoring_interfaces::msg::SatisfactionArray>(
-            "/perception_monitor/satisfaction", 10);
-  }
-
   void handle_bbox(const perception_interfaces::msg::BoundingBoxes::SharedPtr msg) {
     auto frame      = percemon::datastream::Frame{};
     frame.timestamp = rclcpp::Time{msg->header.stamp}.seconds();
@@ -126,6 +104,37 @@ struct Monitor : public rclcpp::Node {
 
     this->m_sat_pub->publish(ret);
   }
+
+  Monitor() :
+      rclcpp::Node("perception_monitor"),
+      m_monitor1{get_phi1(), 10.0, IMG_WIDTH, IMG_HEIGHT},
+      m_monitor2{get_phi2(), 10.0, IMG_WIDTH, IMG_HEIGHT} {
+    RCLCPP_INFO(get_logger(), "*****************************");
+    RCLCPP_INFO(get_logger(), " Perception Monitoring Node ");
+    RCLCPP_INFO(get_logger(), "*****************************");
+    RCLCPP_INFO(get_logger(), " * namespace: %s", get_namespace());
+    RCLCPP_INFO(get_logger(), " * node name: %s", get_name());
+    RCLCPP_INFO(get_logger(), "*****************************");
+
+    this->m_bbox_sub =
+        this->create_subscription<perception_interfaces::msg::BoundingBoxes>(
+            "/object_detector/detections",
+            10,
+            std::bind(&Monitor::handle_bbox, this, std::placeholders::_1));
+
+    this->m_sat_pub =
+        this->create_publisher<monitoring_interfaces::msg::SatisfactionArray>(
+            "/perception_monitor/satisfaction", 10);
+  }
 };
 
-}  // namespace percemon_ros
+}  // namespace perception_monitor
+
+int main(int argc, char** argv) {
+  rclcpp::init(argc, argv);
+
+  auto node = std::make_shared<perception_monitor::Monitor>();
+
+  rclcpp::spin(node);
+  rclcpp::shutdown();
+}
