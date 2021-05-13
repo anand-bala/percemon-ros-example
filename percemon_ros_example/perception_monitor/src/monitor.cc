@@ -83,10 +83,10 @@ struct Monitor : public rclcpp::Node {
       auto obj          = percemon::datastream::Object{};
       obj.object_class  = bbox.class_id;
       obj.probability   = bbox.probability;
-      obj.bbox.xmax     = bbox.x + bbox.width;
-      obj.bbox.xmin     = bbox.x;
-      obj.bbox.ymin     = bbox.y;
-      obj.bbox.ymax     = bbox.y + bbox.height;
+      obj.bbox.xmax     = bbox.xmax;
+      obj.bbox.xmin     = bbox.xmin;
+      obj.bbox.ymin     = bbox.ymin;
+      obj.bbox.ymax     = bbox.ymax;
       frame.objects[id] = obj;
     }
 
@@ -95,7 +95,7 @@ struct Monitor : public rclcpp::Node {
 
     auto ret     = monitoring_interfaces::msg::SatisfactionArray{};
     auto header  = msg->header;
-    header.stamp = this->get_clock()->now();
+    // header.stamp = this->get_clock()->now();
     ret.header   = header;
     auto values  = std::vector<bool>{};
     values.push_back(m_monitor1.eval() >= 0);
