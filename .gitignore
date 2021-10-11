@@ -1,0 +1,54 @@
+
+# Created by https://www.toptal.com/developers/gitignore/api/ros2,cpp,cmake
+# Edit at https://www.toptal.com/developers/gitignore?templates=ros2,cpp,cmake
+
+### CMake ###
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+### CMake Patch ###
+# External projects
+*-prefix/
+
+#!! ERROR: cpp is undefined. Use list command to see defined gitignore types !!#
+
+### ROS2 ###
+install/
+log/
+build/
+
+# Ignore generated docs
+*.dox
+*.wikidoc
+
+# eclipse stuff
+.project
+.cproject
+
+# qcreator stuff
+
+srv/_*.py
+*.pcd
+*.pyc
+qtcreator-*
+*.user
+
+*~
+
+# Emacs
+.#*
+
+# Colcon custom files
+COLCON_IGNORE
+AMENT_IGNORE
+
+# End of https://www.toptal.com/developers/gitignore/api/ros2,cpp,cmake
